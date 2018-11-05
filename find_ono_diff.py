@@ -16,7 +16,7 @@ with open("naka_result.txt") as f:
 		print(li & li2)
 		print(len(li&li2))
 
-word = "きらきら"
+word = input("search collocating words : ")
 
 with open("all_line_info_n.csv") as f:
 	l_s = []
@@ -47,5 +47,6 @@ for obj,str in zip([l_s_new,l_s_new_verb,l_s_new_noun,l_s_new_adj,l_s_new_adv],[
 	corpus = nltk.Text(obj)
 	bigrams = nltk.bigrams(corpus)
 	cfd = nltk.ConditionalFreqDist(bigrams)
-	for key,value in sorted(dict(cfd[word]).items(),key = lambda x:x[1],reverse=True)[:10]:
-		print(key,value)
+	for key,value in sorted(dict(cfd[word]).items(),key = lambda x:x[1],reverse=True):
+		if value != 1 and key !=word:
+			print(key,value)
