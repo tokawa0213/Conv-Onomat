@@ -14,6 +14,7 @@ from copy import deepcopy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+
 class Ono():
     def __init__(self):
         self.col_names = [str(i) for i in range(1000)]
