@@ -9,6 +9,7 @@ from tqdm import tqdm
 b_name = "naka_result-mid.txt"
 d = "naka/"
 
+#The order is important DO NOT USE glob
 look_up_files = ['narou_books/年間アクション〔文芸〕/',
  'narou_books/年間ホラー〔文芸〕/',
  'narou_books/年間ヒューマンドラマ〔文芸〕/',
@@ -48,6 +49,7 @@ f_names = ['./csv_pack_action/',
  './csv_pack_history/',
 './csv_pack_comedy/']
 
+exclude_strings = "表紙"
 
 f_names = [i + d for i in f_names]
 
@@ -84,7 +86,7 @@ for look_up_file,f_name in zip(look_up_files,f_names):
                                 # ono_counter = {"pachipachi":1,...}
                                 # story = book_id
                 else:
-                    if "表紙" in data:
+                    if exclude_strings in data:
                        pass
                     else:
                         with open(data, "r") as f:
