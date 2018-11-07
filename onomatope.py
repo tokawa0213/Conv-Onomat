@@ -161,42 +161,35 @@ class ono_naka(Ono):
 class ono_okawa(ono_naka):
     def __init__(self):
         super(ono_okawa,self).__init__()
+        self.sem_dic = defaultdict(list)
+        with open("naka_jisho") as f:
+                    for line in f:
+                        line = line.split("\t")
+                        if line[0] == "大":
+                            big = line[1].rstrip("\n")
+                        elif line[0] == "中":
+                            med = line[1].rstrip("\n")
+                        elif line[0] == "小":
+                            small = line[1].rstrip("\n")
+                        else:
+                            self.sem_dic[line[1].rstrip("\n")].append([big,med,small])
     def S(self,word):
-        try:
-            self.df_line_info_n[word]
-        except:
-            return 0
         if len(word)%2 == 0:
             word1 = word[:len(word)//2] + word[:len(word)//2]
             word2 = word[len(word)//2:] + word[len(word)//2:]
         else:
             word1 = word[:len(word)//2] + word[:len(word)//2]
             word2 = word[len(word)//2:] + word[len(word)//2:]
-            if(word1 in self.df_kata.keys() or word2 in self.df_kata.keys()):
+            if(word1 in self.df_line_info_n.keys() or word2 in self.df_line_info_n.keys()):
                 pass
             else:
                 word1 = word[:len(word)//2+1] + word[:len(word)//2+1]
                 word2 = word[len(word)//2+1:] + word[len(word)//2+1:]
-        big = ""
-        med = ""
-        small = ""
-        sem_dic = defaultdict(list)
-        with open("naka_jisho") as f:
-            for line in f:
-                line = line.split("\t")
-                if line[0] == "大":
-                    big = line[1]
-                elif line[0] == "中":
-                    med = line[1]
-                elif line[0] == "小":
-                    small = line[1]
-                else:
-                    sem_dic[line[1]].append([big,med,small])
         #split words
         s_score = 0
         dis_max = 3
         try:
-            s_score = sum([sem_dic[word1][i] == sem_dic[word2][i] for i in range(dis_max)])
+            s_score = sum([self.sem_dic[word1][i] == self.sem_dic[word2][i] for i in range(dis_max)])
         except:
             pass
         return s_score/float(dis_max)
