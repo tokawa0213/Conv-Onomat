@@ -53,6 +53,17 @@ exclude_strings = "表紙"
 
 f_names = [i + d for i in f_names]
 
+def l_o_counter(f):
+    with open(data, "r") as f:
+        for line in tqdm(f):
+            # convert katakana into hiragana
+            line = jaconv.kata2hira(line)
+            line = line.rstrip("\n")
+            for i in re.findall(ono_lis_st, line):
+                ono_counter[i] += 1
+                # ono_counter = {"pachipachi":1,...}
+                                # story = book_id
+
 for look_up_file,f_name in zip(look_up_files,f_names):
     ono_lis = []
     with open(b_name,"r") as f:
@@ -76,30 +87,14 @@ for look_up_file,f_name in zip(look_up_files,f_names):
                 if f_name + story.lstrip(look_up_file) + "mid.csv" in glob(f_name+"*.csv"):
                     pass
                 elif len(glob(story + "/*")) == 1:
-                    with open(data, "r") as f:
-                        for line in tqdm(f):
-                            # convert katakana into hiragana
-                            line = jaconv.kata2hira(line)
-                            line = line.rstrip("\n")
-                            for i in re.findall(ono_lis_st, line):
-                                ono_counter[i] += 1
-                                # ono_counter = {"pachipachi":1,...}
-                                # story = book_id
+                    l_o_counter(f)
                 else:
                     if exclude_strings in data:
-                       pass
+                        pass
                     else:
-                        with open(data, "r") as f:
-                            for line in f:
-                                # convert katakana into hiragana
-                                line = jaconv.kata2hira(line)
-                                for i in re.findall(ono_lis_st, line):
-                                    ono_counter[i] += 1
-                                    # ono_counter = {"pachipachi":1,...}
-                                    # story = book_id
+                        l_o_counter(f)
             if f_name + story.lstrip(look_up_file) + "mid.csv" in glob(f_name + "*.csv"):
                 pass
             else:
-                df = pd.DataFrame([[i for i in ono_counter.values() if i > 0]], index=[story],
-                                      columns=[i for i in ono_counter.keys() if ono_counter[i] > 0])
+                df = pd.DataFrame([[i for i in ono_counter.values() if i > 0]], index=[story],columns=[i for i in ono_counter.keys() if ono_counter[i] > 0])
                 df.to_csv(f_name + story.lstrip(look_up_file) + "mid.csv", index=False)

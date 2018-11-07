@@ -13,7 +13,7 @@ import sys
 from copy import deepcopy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+from collections import defaultdict
 
 class Ono():
     def __init__(self):
@@ -94,6 +94,9 @@ class Ono():
 
         self.term_doc = vectorizer.fit_transform(self.all_vocab)
         #print(cosine_similarity(self.term_doc[1:1+1], self.term_doc))
+class ono_naka(Ono):
+    def __init__(self):
+        super(ono_naka,self).__init__()
     def P(self,word):
         word = jaconv.hira2kata(word)
         try:
@@ -130,9 +133,8 @@ class Ono():
         else:
             return 0
 
-        #result contains combined ono
-        #result2 and result3 contains pure ono
-
+            #result contains combined ono
+            #result2 and result3 contains pure ono
     def I(self,word):
         m=0.05 #tuning parameter
         try:
@@ -155,36 +157,80 @@ class Ono():
         n = 10 #tuning parameter
         self.Cvalue = 2/(1+math.exp(-n*K/(H+1))) -1
         return self.Cvalue
-    def get_final_value(self):
-        pass
 
-Ono1 =Ono()
-word_list = Ono1.df_hira.keys()
-df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP"])
+class ono_okawa(ono_naka):
+    def __init__(self):
+        super(ono_okawa,self).__init__()
+    def S(self,word):
+        try:
+            self.df_line_info_n[word]
+        except:
+            return 0
+        if len(word)%2 == 0:
+            word1 = word[:len(word)//2] + word[:len(word)//2]
+            word2 = word[len(word)//2:] + word[len(word)//2:]
+        else:
+            word1 = word[:len(word)//2] + word[:len(word)//2]
+            word2 = word[len(word)//2:] + word[len(word)//2:]
+            if(word1 in self.df_kata.keys() or word2 in self.df_kata.keys()):
+                pass
+            else:
+                word1 = word[:len(word)//2+1] + word[:len(word)//2+1]
+                word2 = word[len(word)//2+1:] + word[len(word)//2+1:]
+        big = ""
+        med = ""
+        small = ""
+        sem_dic = defaultdict(list)
+        with open("naka_jisho") as f:
+            for line in f:
+                line = line.split("\t")
+                if line[0] == "大":
+                    big = line[1]
+                elif line[0] == "中":
+                    med = line[1]
+                elif line[0] == "小":
+                    small = line[1]
+                else:
+                    sem_dic[line[1]].append([big,med,small])
+        #split words
+        s_score = 0
+        dis_max = 3
+        try:
+            s_score = sum([sem_dic[word1][i] == sem_dic[word2][i] for i in range(dis_max)])
+        except:
+            pass
+        return s_score/float(dis_max)
 
-for word in tqdm(word_list):
-    if len(word)%2 == 0:
-        P = Ono1.P(word)/0.773041177880463
-        I = Ono1.I(word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
-        C = Ono1.C(word)
-        if [C,I,P,C+I,C+P,I+P,C+I+P] == [0,0,0,0,0,0,0]:
-            pass
+if __name__  == "__main__":
+    Ono1 = ono_okawa()
+    word_list = Ono1.df_hira.keys()
+    df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
+
+    for word in tqdm(word_list):
+        if len(word)%2 == 0:
+            P = Ono1.P(word)/0.773041177880463
+            I = Ono1.I(word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
+            C = Ono1.C(word)
+            S = Ono1.S(word)
+            if [C,I,P,C+I,C+P,I+P,C+I+P,S,S+C+I+P] == [0,0,0,0,0,0,0,0,0]:
+                pass
+            else:
+                series = pd.Series([word,C,I,P,C+I,C+P,I+P,C+I+P,S,S+C+I+P],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
+                df = df.append(series,ignore_index=True)
         else:
-            series = pd.Series([word,C,I,P,C+I,C+P,I+P,C+I+P],index=["Word","C","I","P","CI","CP","IP","CIP"])
-            df = df.append(series,ignore_index=True)
-    else:
-        P = Ono1.P(word)/0.773041177880463
-        I1 = Ono1.I(word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
-        I2 = Ono1.I(word[:len(word)//2+1]+word[:len(word)//2+1]+word[len(word)//2+1:]+word[len(word)//2+1:])
-        if I1 >= I2:
-            I = I1
-        else:
-            I = I2
-        C = Ono1.C(word)
-        if [C,I,P,C+I,C+P,I+P,C+I+P] == [0,0,0,0,0,0,0]:
-            pass
-        else:
-            series = pd.Series([word,C,I,P,C+I,C+P,I+P,C+I+P],index=["Word","C","I","P","CI","CP","IP","CIP"])
-            df = df.append(series, ignore_index=True)
-df.to_csv("./PIC.csv")
-#TODO: The value P has to be normalized
+            P = Ono1.P(word)/0.773041177880463
+            I1 = Ono1.I(word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
+            I2 = Ono1.I(word[:len(word)//2+1]+word[:len(word)//2+1]+word[len(word)//2+1:]+word[len(word)//2+1:])
+            if I1 >= I2:
+                I = I1
+            else:
+                I = I2
+            C = Ono1.C(word)
+            S = Ono1.S(word)
+            if [C,I,P,C+I,C+P,I+P,C+I+P,S,C+I+P+S] == [0,0,0,0,0,0,0,0,0]:
+                pass
+            else:
+                series = pd.Series([word,C,I,P,C+I,C+P,I+P,C+I+P,S,S+I+C+P],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
+                df = df.append(series, ignore_index=True)
+    df.to_csv("./PICS.csv")
+    #TODO: The value P has to be normalized
