@@ -49,6 +49,7 @@ class ono_okawa(ono_naka):
             return 0
         s_score = 0
         dis_max = 3
+        temp = 0
         for cat1 in self.sem_dic[word1]:
             for cat2 in self.sem_dic[word2]:
                 temp = 0
@@ -66,31 +67,32 @@ class ono_okawa(ono_naka):
                 return -0.5
             else:
                 return 0.0
-    def calculate_all(word):
-        m = 0.773041177880463
-        P = ono_okawa.P(word)/m
-        C = ono_okawa.C(word)
-        S = ono_okawa.S(word)
-        df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
-        if len(word)%2 == 0:
-            I = Ono1.I(word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
-        else:
-            I1 = Ono1.I(word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
-            I2 = Ono1.I(word[:len(word)//2+1]+word[:len(word)//2+1]+word[len(word)//2+1:]+word[len(word)//2+1:])
-            if I1 >= I2:
-                I = I1
+
+    def calculate_all(self,word):
+            m = 0.773041177880463
+            p = ono_okawa.P(self,word)/m
+            c = ono_okawa.C(self,word)
+            s = ono_okawa.S(self,word)
+            m = ono_okawa.S(self,word)
+            df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP","S","M","CIPS","MCIPS"])
+            if len(word)%2 == 0:
+                i = ono_okawa.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
             else:
-                I = I2
-        if sum([C,I,P,S]) == 0:
-            pass
-        else:
-            series = pd.Series([word,C,I,P,C+I,C+P,I+P,C+I+P,S,S+I+C+P],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
-            df = df.append(series, ignore_index=True)
-            df.to_csv("./PICS.csv")
+                i1 = ono_okawa.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
+                i2 = ono_okawa.I(self,word[:len(word)//2+1]+word[:len(word)//2+1]+word[len(word)//2+1:]+word[len(word)//2+1:])
+                if i1 >= i2:
+                    i = i1
+                else:
+                    i = i2
+            if sum([c,i,p,s,m]) == 0:
+                pass
+            else:
+                series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,m,s+i+c+p,s+i+c+p+m],index=["Word","C","I","P","CI","CP","IP","CIP","S","M","CIPS","MCIPS"])
+                df = df.append(series, ignore_index=True)
+                df.to_csv("./PICS.csv")
 
 if __name__  == "__main__":
     Ono1 = ono_okawa()
     word_list = Ono1.df_hira.keys()
     for word in tqdm(word_list):
         Ono1.calculate_all(word)
-    #TODO: The value P has to be normalized
