@@ -32,6 +32,8 @@ class ono_okawa(ono_naka):
                         else:
                             self.sem_dic[line[1].rstrip("\n")].append([big,med,small])
     def S(self,word):
+        #semantic similarity
+        #Might be similar with P ?
         if len(word)%2 == 0:
             word1 = word[:len(word)//2] + word[:len(word)//2]
             word2 = word[len(word)//2:] + word[len(word)//2:]
@@ -43,8 +45,8 @@ class ono_okawa(ono_naka):
             else:
                 word1 = word[:len(word)//2+1] + word[:len(word)//2+1]
                 word2 = word[len(word)//2+1:] + word[len(word)//2+1:]
-        if word1 not in self.sem_dic.keys() and word2 not in self.sem_dic.keys():
-            return 0.0
+        if word1 not in self.sem_dic.keys() or word2 not in self.sem_dic.keys():
+            return 0
         s_score = 0
         dis_max = 3
         for cat1 in self.sem_dic[word1]:
@@ -54,7 +56,9 @@ class ono_okawa(ono_naka):
                     temp += sum([cat1[c] == cat2[c]])
                 s_score = max(temp,s_score)
         return s_score/float(dis_max)
+
     def M(self,word):
+        #ABCAB ? Is this OK ?
         if len(word)%2 == 0:
             return 0.0
         else:
@@ -62,39 +66,31 @@ class ono_okawa(ono_naka):
                 return -0.5
             else:
                 return 0.0
-
-
-
-if __name__  == "__main__":
-    Ono1 = ono_okawa()
-    word_list = Ono1.df_hira.keys()
-    df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
-
-    for word in tqdm(word_list):
+    def calculate_all(word):
+        m = 0.773041177880463
+        P = ono_okawa.P(word)/m
+        C = ono_okawa.C(word)
+        S = ono_okawa.S(word)
+        df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
         if len(word)%2 == 0:
-            P = Ono1.P(word)/0.773041177880463
             I = Ono1.I(word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
-            C = Ono1.C(word)
-            S = Ono1.S(word)
-            if [C,I,P,C+I,C+P,I+P,C+I+P,S,S+C+I+P] == [0,0,0,0,0,0,0,0,0]:
-                pass
-            else:
-                series = pd.Series([word,C,I,P,C+I,C+P,I+P,C+I+P,S,S+C+I+P],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
-                df = df.append(series,ignore_index=True)
         else:
-            P = Ono1.P(word)/0.773041177880463
             I1 = Ono1.I(word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
             I2 = Ono1.I(word[:len(word)//2+1]+word[:len(word)//2+1]+word[len(word)//2+1:]+word[len(word)//2+1:])
             if I1 >= I2:
                 I = I1
             else:
                 I = I2
-            C = Ono1.C(word)
-            S = Ono1.S(word)
-            if [C,I,P,C+I,C+P,I+P,C+I+P,S,C+I+P+S] == [0,0,0,0,0,0,0,0,0]:
-                pass
-            else:
-                series = pd.Series([word,C,I,P,C+I,C+P,I+P,C+I+P,S,S+I+C+P],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
-                df = df.append(series, ignore_index=True)
-    df.to_csv("./PICS.csv")
+        if sum([C,I,P,S]) == 0:
+            pass
+        else:
+            series = pd.Series([word,C,I,P,C+I,C+P,I+P,C+I+P,S,S+I+C+P],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS"])
+            df = df.append(series, ignore_index=True)
+            df.to_csv("./PICS.csv")
+
+if __name__  == "__main__":
+    Ono1 = ono_okawa()
+    word_list = Ono1.df_hira.keys()
+    for word in tqdm(word_list):
+        Ono1.calculate_all(word)
     #TODO: The value P has to be normalized
