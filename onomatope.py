@@ -19,6 +19,7 @@ from onomatope_base_model import ono_naka
 class ono_okawa(ono_naka):
     def __init__(self):
         super(ono_okawa,self).__init__()
+        self.df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP","S","M","CIPS","MCIPS"])
         self.sem_dic = defaultdict(list)
         with open("naka_jisho") as f:
                     for line in f:
@@ -45,8 +46,6 @@ class ono_okawa(ono_naka):
             else:
                 word1 = word[:len(word)//2+1] + word[:len(word)//2+1]
                 word2 = word[len(word)//2+1:] + word[len(word)//2+1:]
-        if word1 not in self.sem_dic.keys() or word2 not in self.sem_dic.keys():
-            return 0
         s_score = 0
         dis_max = 3
         temp = 0
@@ -69,12 +68,11 @@ class ono_okawa(ono_naka):
                 return 0.0
 
     def calculate_all(self,word):
-            m = 0.773041177880463
-            p = ono_okawa.P(self,word)/m
+            ma = 0.773041177880463
+            p = ono_okawa.P(self,word)/ma
             c = ono_okawa.C(self,word)
             s = ono_okawa.S(self,word)
             m = ono_okawa.S(self,word)
-            df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP","S","M","CIPS","MCIPS"])
             if len(word)%2 == 0:
                 i = ono_okawa.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
             else:
@@ -87,12 +85,12 @@ class ono_okawa(ono_naka):
             if sum([c,i,p,s,m]) == 0:
                 pass
             else:
-                series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,m,s+i+c+p,s+i+c+p+m],index=["Word","C","I","P","CI","CP","IP","CIP","S","M","CIPS","MCIPS"])
-                df = df.append(series, ignore_index=True)
-                df.to_csv("./PICS.csv")
+                series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,s+i+c+p,m,m+c+i+p+s],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS","M","MCIPS"])
+                self.df = self.df.append(series, ignore_index=True)
 
 if __name__  == "__main__":
     Ono1 = ono_okawa()
     word_list = Ono1.df_hira.keys()
     for word in tqdm(word_list):
         Ono1.calculate_all(word)
+    Ono1.df.to_csv("./PICS.csv")
