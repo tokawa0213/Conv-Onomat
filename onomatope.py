@@ -72,7 +72,7 @@ class ono_okawa(ono_naka):
             p = ono_okawa.P(self,word)/ma
             c = ono_okawa.C(self,word)
             s = ono_okawa.S(self,word)
-            m = ono_okawa.S(self,word)
+            m = ono_okawa.M(self,word)
             if len(word)%2 == 0:
                 i = ono_okawa.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
             else:
