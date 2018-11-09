@@ -157,3 +157,29 @@ class ono_naka(Ono):
         n = 10 #tuning parameter
         self.Cvalue = 2/(1+math.exp(-n*K/(H+1))) -1
         return self.Cvalue
+    def calculate_all(self,word):
+        ma = 0.773041177880463
+        p = ono_naka.P(self,word)/ma
+        c = ono_naka.C(self,word)
+        if len(word)%2 == 0:
+            i = ono_naka.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
+        else:
+            i1 = ono_naka.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
+            i2 = ono_naka.I(self,word[:len(word)//2+1]+word[:len(word)//2+1]+word[len(word)//2+1:]+word[len(word)//2+1:])
+            if i1 >= i2:
+                i = i1
+            else:
+                i = i2
+        if sum([c,i,p]) == 0:
+            pass
+        else:
+            series = pd.Series([word,c,i,p,c+i+p],index=["Word","C","I","P","CIP"])
+            self.df = self.df.append(series, ignore_index=True)
+
+if __name__ == "__main__":
+    Ono1 = ono_naka()
+    word_list = Ono1.df_hira.keys()
+    for word in tqdm(word_list):
+        Ono1.calculate_all(word)
+    Ono1.df.to_csv("PICnaka.csv")
+
