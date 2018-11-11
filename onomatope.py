@@ -63,7 +63,7 @@ class ono_okawa(ono_naka):
             return 0.0
         else:
             if word[:len(word)//2] == word[len(word)//2+1:]:
-                return -0.5
+                return -1.0
             else:
                 return 0.0
 
@@ -85,7 +85,7 @@ class ono_okawa(ono_naka):
         if sum([c,i,p,s,m]) == 0:
             pass
         else:
-            series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,s+i+c+p,m,m+c+i+p+s],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS","M","MCIPS"])
+            series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,s+i+c+p,m,m+c+i+p,m+c+i+p+s],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS","M","MPIC","MCIPS"])
             self.df = self.df.append(series, ignore_index=True)
 
 if __name__  == "__main__":

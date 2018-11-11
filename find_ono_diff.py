@@ -18,7 +18,7 @@ with open("naka_result.txt") as f:
 
 word = input("search collocating words : ")
 
-with open("all_line_info_n.csv") as f:
+with open("all_karai.csv") as f:
 	l_s = []
 	for line in f:
 		l_word = []

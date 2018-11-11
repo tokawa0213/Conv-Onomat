@@ -51,15 +51,16 @@ f_names = ['./csv_pack_action/',
 
 f_names = [i + d for i in f_names]
 
-
 for look_up_file,f_name in zip(look_up_files,f_names):
     ono_lis = []
     with open(b_name,"r") as f:
         for line in f:
             ono_lis.append(line.rstrip("\n"))
     ono_lis = list(set(ono_lis))
+    ono_lis = ["辛い"]
     ono_counter = {}
     ono_lis_st = "|".join(ono_lis)
+    ono_lis_st = "辛い"
 
     file_list = glob(look_up_file.rstrip("/"))
     ono = []
@@ -71,7 +72,7 @@ for look_up_file,f_name in zip(look_up_files,f_names):
             for i in ono_lis:
                 ono_counter[i] = []
             for data in tqdm(glob(story + "/*")):
-                if f_name+ story.lstrip(look_up_file) + "line_info.csv" in glob(f_name+"*.csv"):
+                if f_name+ story.lstrip(look_up_file) + "line_info_karai.csv" in glob(f_name+"*.csv"):
                     pass
                 elif len(glob(story + "/*")) == 1:
                     with open(data, "r") as f:
@@ -79,8 +80,8 @@ for look_up_file,f_name in zip(look_up_files,f_names):
                             # convert katakana into hiragana
                             line = jaconv.kata2hira(line)
                             line = line.rstrip("\n")
-                            for pattern in ono_lis_st.split("|"):
-                                    ono_counter[pattern].append(re.findall(pattern,line)[0])
+                            for i in re.findall(ono_lis_st,line):
+                                ono_counter[i].append(line)
                                     # ono_counter = {"pachipachi":1,...}
                                     # story = book_id
                 else:
@@ -91,13 +92,13 @@ for look_up_file,f_name in zip(look_up_files,f_names):
                             for line in f:
                                 # convert katakana into hiragana
                                 line = jaconv.kata2hira(line)
-                                for pattern in ono_lis_st.split("|"):
-                                    ono_counter[pattern].append(re.findall(pattern,line)[0])
+                                for i in re.findall(ono_lis_st,line):
+                                    ono_counter[i].append(line)
                                     # ono_counter = {"pachipachi":1,...}
                                     # story = book_id
-            if f_name + story.lstrip(look_up_file) + "line_info.csv" in glob(f_name + "*.csv"):
+            if f_name + story.lstrip(look_up_file) + "line_info_karai.csv" in glob(f_name + "*.csv"):
                 pass
             else:
                 df = pd.DataFrame([[i for i in ono_counter.values() if len(i) > 0]], index=[story],
                                       columns=[i for i in ono_counter.keys() if len(ono_counter[i]) > 0])
-                df.to_csv(f_name + story.lstrip(look_up_file) + "line_info.csv", index=False)
+                df.to_csv(f_name + story.lstrip(look_up_file) + "line_info_karai.csv", index=False)

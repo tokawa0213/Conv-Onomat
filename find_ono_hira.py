@@ -79,7 +79,6 @@ for look_up_file,f_name in zip(look_up_files,f_names):
                             line = jaconv.kata2hira(line)
                             line = line.rstrip("\n")
                             for i in re.findall(ono_lis_st, line):
-                                print(i)
                                 ono_counter[i] += 1
                                 # ono_counter = {"pachipachi":1,...}
                                 # story = book_id
