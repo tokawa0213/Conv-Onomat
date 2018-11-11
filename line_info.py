@@ -79,10 +79,10 @@ for look_up_file,f_name in zip(look_up_files,f_names):
                             # convert katakana into hiragana
                             line = jaconv.kata2hira(line)
                             line = line.rstrip("\n")
-                            for i in re.findall(ono_lis_st, line):
-                                ono_counter[i] .append(line)
-                                # ono_counter = {"pachipachi":1,...}
-                                # story = book_id
+                            for pattern in ono_lis_st.split("|"):
+                                    ono_counter[pattern].append(re.findall(pattern,line)[0])
+                                    # ono_counter = {"pachipachi":1,...}
+                                    # story = book_id
                 else:
                     if "表紙" in data:
                        pass
@@ -91,8 +91,8 @@ for look_up_file,f_name in zip(look_up_files,f_names):
                             for line in f:
                                 # convert katakana into hiragana
                                 line = jaconv.kata2hira(line)
-                                for i in re.findall(ono_lis_st, line):
-                                    ono_counter[i].append(line)
+                                for pattern in ono_lis_st.split("|"):
+                                    ono_counter[pattern].append(re.findall(pattern,line)[0])
                                     # ono_counter = {"pachipachi":1,...}
                                     # story = book_id
             if f_name + story.lstrip(look_up_file) + "line_info.csv" in glob(f_name + "*.csv"):
