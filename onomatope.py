@@ -49,6 +49,8 @@ class ono_okawa(ono_naka):
         s_score = 0
         dis_max = 3
         temp = 0
+        if self.sem_dic[word1] == [] or self.sem_dic[word2] == []:
+            return -10.0
         for cat1 in self.sem_dic[word1]:
             for cat2 in self.sem_dic[word2]:
                 temp = 0
