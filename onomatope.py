@@ -49,8 +49,6 @@ class ono_okawa(ono_naka):
         s_score = 0
         dis_max = 3
         temp = 0
-        if self.sem_dic[word1] == [] or self.sem_dic[word2] == []:
-            return -10.0
         for cat1 in self.sem_dic[word1]:
             for cat2 in self.sem_dic[word2]:
                 temp = 0
@@ -76,19 +74,26 @@ class ono_okawa(ono_naka):
         s = ono_okawa.S(self,word)
         m = ono_okawa.M(self,word)
         if len(word)%2 == 0:
+            w_temp = word[:len(word)//2]
+            w_temp2 = word[len(word)//2:]
             i = ono_okawa.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
         else:
             i1 = ono_okawa.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
             i2 = ono_okawa.I(self,word[:len(word)//2+1]+word[:len(word)//2+1]+word[len(word)//2+1:]+word[len(word)//2+1:])
             if i1 >= i2:
+                w_temp = word[:len(word)//2] + word[:len(word)//2]
+                w_temp2 = word[len(word)//2:] + word[len(word)//2:]
                 i = i1
             else:
+                w_temp = word[:len(word)//2+1] + word[:len(word)//2+1]
+                w_temp2 = word[len(word)//2+1:] + word[len(word)//2+1:]
                 i = i2
         if sum([c,i,p,s,m]) == 0:
             pass
         else:
-            series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,s+i+c+p,m,m+c+i+p,m+c+i+p+s],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS","M","MPIC","MCIPS"])
-            self.df = self.df.append(series, ignore_index=True)
+            if w_temp in self.sem_dic.keys() and w_temp2 in self.sem_dic.keys():
+                series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,s+i+c+p,m,m+c+i+p,m+c+i+p+s],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS","M","MPIC","MCIPS"])
+                self.df = self.df.append(series, ignore_index=True)
 
 if __name__  == "__main__":
     Ono1 = ono_okawa()

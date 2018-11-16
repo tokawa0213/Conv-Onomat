@@ -1,12 +1,10 @@
-import os
-import shutil
-from glob import glob
-import re
+import pandas as pd
 
-name = "sf"
+df = pd.read_csv("PICS.csv")
+li = []
+with open("naka_jisho") as f:
+    for line in f:
+        if line.split("\t")[0] not in ["大","中","小"]:
+            li.append(line.split("\t")[1])
+df = df[li]
 
-for i in glob("csv_pack_" + name + "*"):
-    shutil.move(i,"csv_pack_"+name + "/")
-
-for i in glob("csv_pack_" + name + "/*"):
-    os.rename(i,"csv_pack_" + name + "/" + i.lstrip("csv_pack_" + name + "/csv_pack_" + name))
