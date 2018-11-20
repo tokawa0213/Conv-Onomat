@@ -19,7 +19,7 @@ from preprocess_scripts.integrate import integrate
 from preprocess_scripts.integrate_fin import integrate_fin
 
 class Base_Lookup():
-    def __init__(self,option,d="naka"):
+    def __init__(self,option=None,d="naka"):
         self.theme_list = ["action","sf","bungaku","comedy","douwa","essay","highfantasy","history","horror","human","isekai","lowfantasy","mystery","other","panic","poem","real","space","vrgame"]
         self.look_up_files = ['../narou_books/年間アクション〔文芸〕/',
          '../narou_books/年間ホラー〔文芸〕/',
@@ -74,7 +74,7 @@ class Base_Lookup():
         elif option == "find_ono_hira" or option == "find_ono_kata" or option == "line_info" or option == "line_info_k":
             self.b_name = "../dictionary_resource/" + d + "/" + d + "_result-mix.txt"
         else:
-            raise Exception
+            pass
     def count(self):
         if self.option == "mid":mid_func(self)
         elif self.option == "line_info_n_k":line_info_n_k_func(self)
@@ -86,8 +86,8 @@ class Base_Lookup():
         else:raise Exception
     def all(self):
         integrate(self)
-        integrate_fin(self,self.option)
+    def all2(self):
+        integrate_fin(self)
 
 if __name__ == "__main__":
-    obj = Base_Lookup("find_ono_kata")
-    obj.count()
+    Base_Lookup().all2()
