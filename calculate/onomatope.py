@@ -1,27 +1,14 @@
-import math
-import jaconv
-import re
 import pandas as pd
 from tqdm import tqdm
-import MeCab
-import codecs
-from gensim import models
-from gensim.models.doc2vec import TaggedDocument
-from gensim.models import word2vec
-import logging
-import sys
-from copy import deepcopy
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from collections import defaultdict
-from onomatope_base_model import ono_naka
+from calculate.onomatope_base_model import ono_naka
 
 class ono_okawa(ono_naka):
     def __init__(self):
         super(ono_okawa,self).__init__()
         self.df = pd.DataFrame(index=[],columns=["Word","C","I","P","CI","CP","IP","CIP","S","M","CIPS","MCIPS"])
         self.sem_dic = defaultdict(list)
-        with open("naka_jisho") as f:
+        with open("../dictionary_resource/naka/naka_jisho") as f:
                     for line in f:
                         line = line.split("\t")
                         if line[0] == "大":
