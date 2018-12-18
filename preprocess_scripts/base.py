@@ -20,6 +20,7 @@ from preprocess_scripts.integrate_fin import integrate_fin
 
 class Base_Lookup():
     def __init__(self,option=None,d="naka"):
+        self.d = d
         self.theme_list = ["action","sf","bungaku","comedy","douwa","essay","highfantasy","history","horror","human","isekai","lowfantasy","mystery","other","panic","poem","real","space","vrgame"]
         self.look_up_files = ['../narou_books/年間アクション〔文芸〕/',
          '../narou_books/年間ホラー〔文芸〕/',
@@ -64,15 +65,15 @@ class Base_Lookup():
 
         #The script above is data driven
 
-        self.f_names = [i + d + "/" for i in self.f_names]
+        self.f_names = [i + self.d + "/" for i in self.f_names]
 
         self.option = option
         if option == "mid":
-            self.b_name = "../dictionary_resource/" + d + "/" + d + "_result-mid.txt"
+            self.b_name = "../dictionary_resource/" + self.d + "/" + self.d + "_result-mid.txt"
         elif option == "line_info_n_k" or option == "line_info_n":
-            self.b_name = "../dictionary_resource/" + d + "/" + d + "_result.txt"
+            self.b_name = "../dictionary_resource/" + self.d + "/" + self.d + "_result.txt"
         elif option == "find_ono_hira" or option == "find_ono_kata" or option == "line_info" or option == "line_info_k":
-            self.b_name = "../dictionary_resource/" + d + "/" + d + "_result-mix.txt"
+            self.b_name = "../dictionary_resource/" + self.d + "/" + self.d + "_result-mix.txt"
         else:
             pass
     def count(self):
@@ -83,6 +84,17 @@ class Base_Lookup():
         elif self.option == "find_ono_kata":find_ono_kata_func(self)
         elif self.option == "line_info":line_info_func(self)
         elif self.option == "line_info_k":line_info_k_func(self)
+        elif self.option == "all":
+            self.b_name = "../dictionary_resource/" + self.d + "/" + self.d + "_result-mid.txt"
+            mid_func(self)
+            self.b_name = "../dictionary_resource/" + self.d + "/" + self.d + "_result.txt"
+            line_info_n_k_func(self)
+            line_info_n_func(self)
+            self.b_name = "../dictionary_resource/" + self.d + "/" + self.d + "_result-mix.txt"
+            find_ono_hira_func(self)
+            find_ono_kata_func(self)
+            line_info_func(self)
+            line_info_k_func(self)
         else:raise Exception
     def all(self):
         integrate(self)
@@ -90,4 +102,7 @@ class Base_Lookup():
         integrate_fin(self)
 
 if __name__ == "__main__":
-    Base_Lookup().all2()
+    b = Base_Lookup("all")
+    b.count()
+    b.all()
+    b.all2()

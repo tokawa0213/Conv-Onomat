@@ -30,8 +30,9 @@ a=0, b=1 ... z=25
 
 time_span = "年間"
 #genre = "ヒューマンドラマ〔文芸〕"
-#exclude: "童話〔その他〕""推理〔文芸〕""純文学〔文芸〕""ホラー〔文芸〕""ヒューマンドラマ〔文芸〕"
-genre_list = ["ハイファンタジー〔ファンタジー〕","ローファンタジー〔ファンタジー〕"]
+#exclude:
+genre_list = ["ハイファンタジー〔ファンタジー〕","ローファンタジー〔ファンタジー〕","空想科学〔SF〕","アクション〔文芸〕","コメディー〔文芸〕","VRゲーム〔SF〕","宇宙〔SF〕","空想科学〔SF〕","童話〔その他〕",
+              "推理〔文芸〕","純文学〔文芸〕","ホラー〔文芸〕","ヒューマンドラマ〔文芸〕"]
 for genre in genre_list:
     URL = "https://yomou.syosetu.com/rank/genretop/"
     URL2 = "https://yomou.syosetu.com/rank/genrelist/"

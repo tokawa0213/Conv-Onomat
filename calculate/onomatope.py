@@ -1,5 +1,18 @@
+import math
+import jaconv
+import re
 import pandas as pd
 from tqdm import tqdm
+import MeCab
+import codecs
+from gensim import models
+from gensim.models.doc2vec import TaggedDocument
+from gensim.models import word2vec
+import logging
+import sys
+from copy import deepcopy
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from collections import defaultdict
 from calculate.onomatope_base_model import ono_naka
 
@@ -50,9 +63,43 @@ class ono_okawa(ono_naka):
             return 0.0
         else:
             if word[:len(word)//2] == word[len(word)//2+1:]:
-                return -1.0
+                return -0.5
             else:
                 return 0.0
+
+    def K(self, word):
+        d = {
+            "する": 0,
+            "した": 0,
+            "して": 0,
+            "たる": 0,
+            "だ": 0,
+            "な": 0,
+            "に": 0,
+            "の": 0,
+            "が": 0,
+            "は": 0,
+            "を": 0,
+            "と": 0,
+        }
+        try:
+            for sentence in self.df_line_info[word]:
+                m = re.search(word, sentence)
+                if m == None:
+                    pass
+                else:
+                    back = sentence[m.end():m.end() + 1]
+                    if back in d.keys():
+                        d[back] += 1
+                    back = sentence[m.end():m.end() + 2]
+                    if back in d.keys():
+                        d[back] += 1
+            if d["が"] + d["は"] + d["の"] / sum(d.values()) >= 0.8:
+                return 0
+            else:
+                return sum(d.values())
+        except:
+            return 0
 
     def calculate_all(self,word):
         ma = 0.773041177880463
@@ -60,27 +107,21 @@ class ono_okawa(ono_naka):
         c = ono_okawa.C(self,word)
         s = ono_okawa.S(self,word)
         m = ono_okawa.M(self,word)
+        k = ono_okawa.K(self,word)
         if len(word)%2 == 0:
-            w_temp = word[:len(word)//2]
-            w_temp2 = word[len(word)//2:]
             i = ono_okawa.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
         else:
             i1 = ono_okawa.I(self,word[:len(word)//2]+word[:len(word)//2]+word[len(word)//2:]+word[len(word)//2:])
             i2 = ono_okawa.I(self,word[:len(word)//2+1]+word[:len(word)//2+1]+word[len(word)//2+1:]+word[len(word)//2+1:])
             if i1 >= i2:
-                w_temp = word[:len(word)//2] + word[:len(word)//2]
-                w_temp2 = word[len(word)//2:] + word[len(word)//2:]
                 i = i1
             else:
-                w_temp = word[:len(word)//2+1] + word[:len(word)//2+1]
-                w_temp2 = word[len(word)//2+1:] + word[len(word)//2+1:]
                 i = i2
         if sum([c,i,p,s,m]) == 0:
             pass
         else:
-            if w_temp in self.sem_dic.keys() and w_temp2 in self.sem_dic.keys():
-                series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,s+i+c+p,m,m+c+i+p,m+c+i+p+s],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS","M","MPIC","MCIPS"])
-                self.df = self.df.append(series, ignore_index=True)
+            series = pd.Series([word,c,i,p,c+i,c+p,i+p,c+i+p,s,s+i+c+p,m,m+c+i+p+s,k],index=["Word","C","I","P","CI","CP","IP","CIP","S","CIPS","M","MCIPS","K"])
+            self.df = self.df.append(series, ignore_index=True)
 
 if __name__  == "__main__":
     Ono1 = ono_okawa()

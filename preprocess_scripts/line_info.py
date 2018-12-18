@@ -13,10 +13,8 @@ def line_info_func(self):
             for line in f:
                 ono_lis.append(line.rstrip("\n"))
         ono_lis = list(set(ono_lis))
-        ono_lis = ["辛い"]
         ono_counter = {}
         ono_lis_st = "|".join(ono_lis)
-        ono_lis_st = "辛い"
 
         file_list = glob(look_up_file.rstrip("/"))
         ono = []
@@ -52,9 +50,9 @@ def line_info_func(self):
                                         ono_counter[i].append(line)
                                         # ono_counter = {"pachipachi":1,...}
                                         # story = book_id
-                if f_name + story.lstrip(look_up_file) + "line_info_karai.csv" in glob(f_name + "*.csv"):
+                if f_name + story.lstrip(look_up_file) + "line_info.csv" in glob(f_name + "*.csv"):
                     pass
                 else:
                     df = pd.DataFrame([[i for i in ono_counter.values() if len(i) > 0]], index=[story],
                                           columns=[i for i in ono_counter.keys() if len(ono_counter[i]) > 0])
-                    df.to_csv(f_name + story.lstrip(look_up_file) + "line_info_karai.csv", index=False)
+                    df.to_csv(f_name + story.lstrip(look_up_file) + "line_info.csv", index=False)

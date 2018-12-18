@@ -32,3 +32,11 @@ New words appear day by day and to define all of them by man hand is almost impo
 ### How?
 
 More datails will be written later
+
+### How to use the scripts?
+1. Create base onomatope (from dictionary this time : naka_result.txt, made from naka_jisho)
+2. Run hanpuku-mid.py and create mid-state
+3. Run hanpuku-mix.py and find mixed-state
+4. Seacrh for ono in the text file using find_ono_hira, find_ono_kata, line_info, line_info_k, line_info_n, line_info_n_k mid (.py) 
+5. Run base.py to total the distributuion between all categories
+6. Run onomatope.py to caculate the final state
