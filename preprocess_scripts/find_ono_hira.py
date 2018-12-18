@@ -30,12 +30,12 @@ def find_ono_hira_func(self):
                     if f_name + story.lstrip(look_up_file) + ".csv" in glob(f_name+"*.csv"):
                         pass
                     elif len(glob(story + "/*")) == 1:
-                        search_inside_sentence(data,ono_lis_st,ono_counter,"find_ono_hira",True)
+                        ono_counter = search_inside_sentence(data,ono_lis_st,ono_counter,"find_ono_hira",True)
                     else:
                         if self.exclude_strings in data:
                            pass
                         else:
-                            search_inside_sentence(data, ono_lis_st, ono_counter, "find_ono_hira", False)
+                            ono_counter = search_inside_sentence(data, ono_lis_st, ono_counter, "find_ono_hira", False)
                 if f_name + story.lstrip(look_up_file) + ".csv" in glob(f_name + "*.csv"):
                     pass
                 else:
